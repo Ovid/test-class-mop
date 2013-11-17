@@ -1,26 +1,26 @@
 # PODNAME: Test::Class::MOP::Report::Class
 # ABSTRACT: Reporting on test classes
 
-use mop;
-use strict;
-use warnings;
+    use mop;
+    use strict;
+    use warnings;
 
-class Test::Class::MOP::Report::Class
- with Test::Class::MOP::Role::Reporting {
-    has $!error is rw;
-    method has_error { defined $!error }
+    class Test::Class::MOP::Report::Class
+     with Test::Class::MOP::Role::Reporting {
+        has $!error is rw;
+        method has_error { defined $!error }
 
-    has $!test_methods is ro = [];
-    
-    method all_test_methods { @{ $!test_methods } }
+        has $!test_methods is ro = [];
+        
+        method all_test_methods { @{ $!test_methods } }
 
-    method add_test_method($test_method) {
-        push $!test_methods => $test_method;
+        method add_test_method($test_method) {
+            push $!test_methods => $test_method;
+        }
+        method num_test_methods {
+            return scalar @{ $!test_methods };
+        }
     }
-    method num_test_methods {
-        return scalar @{ $!test_methods };
-    }
-}
 
 __END__
 

@@ -48,10 +48,10 @@ not are not test methods.
     class TestsFor::Some::Class extends Test::Class::MOP {
         use Test::Most;
 
-     method test_this_is_a_method($report) {
-         $self->this_is_not_a_test_method;
-         ok 1, 'whee!';
-     }
+         method test_this_is_a_method($report) {
+             $self->this_is_not_a_test_method;
+             ok 1, 'whee!';
+         }
 
         method this_is_not_a_test_method {
            # but you can, of course, call it like normal
@@ -97,20 +97,20 @@ List it as `extends`, as you would expect.
     class TestsFor::Some::Class::Subclass extends TestsFor::Some::Class {
         use Test::Most;
 
-     method test_me($report) {
-         my $class = $self->test_class;
-         ok 1, "I overrode my parent! ($class)";
-     }
+        method test_me($report) {
+            my $class = $self->test_class;
+            ok 1, "I overrode my parent! ($class)";
+        }
 
-     method test_this_baby($report) {
-         my $class = $self->test_class;
-         pass "This should run before my parent method ($class)";
-         $self->next::method($report);
-     }
+        method test_this_baby($report) {
+            my $class = $self->test_class;
+            pass "This should run before my parent method ($class)";
+            $self->next::method($report);
+        }
 
-     method this_should_not_run {
-         fail "We should never see this test";
-     }
+        method this_should_not_run {
+            fail "We should never see this test";
+        }
 
         method test_this_should_be_run($report) {
             for ( 1 .. 5 ) {
@@ -354,11 +354,6 @@ If you really, really want to change how this module works, you can override
 the `runtests` method. We don't recommend it.
 
 Returns the [Test::Class::MOP](https://metacpan.org/pod/Test::Class::MOP) instance.
-
-## `import`
-
-Sadly, we have an `import` method. This is used to automatically provide you
-with all of the [Test::Most](https://metacpan.org/pod/Test::Most) behavior.
 
 # SAMPLE TAP OUTPUT
 
