@@ -16,8 +16,11 @@ my $builder = $tests->test_configuration->builder;
 #
 # exceptions in test control methods should cause the test classes to fail
 #
-TestsFor::Basic::Subclass->meta->add_method(
-    'test_startup' => sub { die 'forced die' },
+mop::meta('TestsFor::Basic::Subclass')->add_method(
+    mop::method->new(
+        name => 'test_startup',
+        body => sub { die 'forced die' },
+    )
 );
 $builder->todo_start('testing the startup() method');
 my @tests;
@@ -63,9 +66,12 @@ eq_or_diff $tests[1], $expected[1],
         'type'      => ''
     },
 );
-TestsFor::Basic::Subclass->meta->remove_method('test_startup');
-TestsFor::Basic::Subclass->meta->add_method(
-    'test_startup' => sub { my $test = shift },
+mop::meta('TestsFor::Basic::Subclass')->remove_method('test_startup');
+mop::meta('TestsFor::Basic::Subclass')->add_method(
+    mop::method->new(
+        name => 'test_startup',
+        body => sub { my $test = shift },
+    )
 );
 $tests = Test::Class::MOP->new;
 subtest 'test_startup() has tests in it' => sub {
@@ -93,15 +99,18 @@ eq_or_diff \@tests, \@expected,
         'type'      => ''
     },
 );
-TestsFor::Basic::Subclass->meta->remove_method('test_startup');
-TestsFor::Basic::Subclass->meta->add_method(
-    'test_setup' => sub {
-        my ( $test, $method ) = @_;
-        my $name = $method->name;
-        explain "About to run $name";
-        pass();
-    },
-); 
+mop::meta('TestsFor::Basic::Subclass')->remove_method('test_startup');
+mop::meta('TestsFor::Basic::Subclass')->add_method(
+    mop::method->new(
+        name => 'test_setup',
+        body => sub {
+            my ( $test, $method ) = @_;
+            my $name = $method->name;
+            explain "About to run $name";
+            pass();
+        },
+    )
+);
 $builder->todo_start('fail?');
 $tests = Test::Class::MOP->new;
 subtest 'test_setup() has tests in it' => sub {
