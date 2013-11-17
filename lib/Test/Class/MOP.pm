@@ -238,9 +238,6 @@ END
         }
         state $classes;
         unless ($classes) {
-            # serious weirdness here. __PACKAGE__ evaluates to
-            # Test::Class::MOP::Load and I don't know the correct way of
-            # fetching that value
             $classes = [
                 sort
                 grep { $_ ne 'Test::Class::MOP' && $_->isa('Test::Class::MOP') }
