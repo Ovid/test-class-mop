@@ -1,3 +1,4 @@
+# PODNAME: Test::Class::MOP
 # ABSTRACT: Test::Class + MOP
 
 use 5.016;

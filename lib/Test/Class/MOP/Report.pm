@@ -1,6 +1,10 @@
+# PODNAME: Test::Class::MOP::Report
 # ABSTRACT: Test information for Test::Class::MOP
 
 use mop;
+use strict;
+use warnings;
+
 class Test::Class::MOP::Report with Test::Class::MOP::Role::Timing {
     has $!num_test_methods is rw = 0;
     has $!num_tests_run    is rw = 0;

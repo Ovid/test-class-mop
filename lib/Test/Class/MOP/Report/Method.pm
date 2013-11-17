@@ -1,6 +1,10 @@
+# PODNAME: Test::Class::MOP::Report::Method
 # ABSTRACT: Reporting on test methods
 
 use mop;
+use strict;
+use warnings;
+
 class Test::Class::MOP::Report::Method 
  with Test::Class::MOP::Role::Reporting {
     has $!num_tests_run is rw = 0;

@@ -1,6 +1,9 @@
+# PODNAME: Test::Class::MOP::Role::Timing
 # ABSTRACT: Report timing role
 
 use mop;
+use strict;
+use warnings;
 
 role Test::Class::MOP::Role::Timing {
     use Benchmark qw(timediff :hireswallclock);

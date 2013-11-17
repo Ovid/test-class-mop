@@ -1,5 +1,4 @@
-package Test::Class::MOP::Config;
-
+# PODNAME: Test::Class::MOP::Config
 # ABSTRACT: Configuration information for Test::Class::MOP
 
 use mop;

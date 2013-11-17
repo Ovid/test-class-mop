@@ -1,6 +1,10 @@
+# PODNAME: Test::Class::MOP::Role::AutoUse
 # ABSTRACT: Automatically load the classes you're testing
 
 use mop;
+use strict;
+use warnings;
+
 role Test::Class::MOP::Role::AutoUse {
     use Carp 'confess';
     has $!class_name is ro = do {

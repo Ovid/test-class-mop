@@ -1,7 +1,10 @@
-
+# PODNAME: Test::Class::MOP::Report::Time
 # ABSTRACT: Reporting object for timing
 
 use mop;
+use strict;
+use warnings;
+
 class Test::Class::MOP::Report::Time {
     use Benchmark qw(timestr :hireswallclock);
 

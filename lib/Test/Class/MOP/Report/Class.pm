@@ -1,8 +1,9 @@
-package Test::Class::MOP::Report::Class;
-
+# PODNAME: Test::Class::MOP::Report::Class
 # ABSTRACT: Reporting on test classes
 
 use mop;
+use strict;
+use warnings;
 
 class Test::Class::MOP::Report::Class
  with Test::Class::MOP::Role::Reporting {

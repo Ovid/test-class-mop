@@ -1,8 +1,9 @@
-package Test::Class::MOP::Role::Reporting;
-
+# PODNAME: Test::Class::MOP::Role::Reporting;
 # ABSTRACT: Reporting gathering role
 
 use mop;
+use strict;
+use warnings;
 
 role Test::Class::MOP::Role::Reporting with Test::Class::MOP::Role::Timing {
     has $!name    is ro;
