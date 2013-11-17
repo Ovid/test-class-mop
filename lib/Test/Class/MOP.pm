@@ -290,60 +290,55 @@ __END__
 
 =head1 SYNOPSIS
 
-    package TestsFor::DateTime;
-    use Test::Class::MOP;
-    use DateTime;
+    use mop;
 
-    # methods that begin with test_ are test methods.
-    sub test_constructor {
-        my ( $test, $report ) = @_;
-        $report->plan(3);    # strictly optional
+    class TestsFor::DateTime extends Test::Class::MOP {
+        use DateTime;
+        use Test::Most;
 
-        can_ok 'DateTime', 'new';
-        my %args = (
-            year  => 1967,
-            month => 6,
-            day   => 20,
-        );
-        isa_ok my $date = DateTime->new(%args), 'DateTime';
-        is $date->year, $args{year}, '... and the year should be correct';
+        # methods that begin with test_ are test methods.
+        method test_constructor($report) {
+            $report->plan(3);    # strictly optional
+
+            can_ok 'DateTime', 'new';
+            my %args = (
+                year  => 1967,
+                month => 6,
+                day   => 20,
+            );
+            isa_ok my $date = DateTime->new(%args), 'DateTime';
+            is $date->year, $args{year}, '... and the year should be correct';
+        }
     }
-
-    1;
 
 =head1 DESCRIPTION
 
-This is B<BETA> code. I encourage you to give it a shot if you want test
+This is B<ALPHA> code. I encourage you to give it a shot if you want test
 classes based on MOP, along with reporting. Feedback welcome as we try to
 improve it.
 
-This is a proof of concept for writing Test::Class-style tests with MOP.
-Better docs will come later. You should already know how to use MOP and
-L<Test::Class>.
+This is a proof of concept for writing Test::Class-style tests with
+L<https://github.com/stevan/p5-mop-redux>. Better docs will come later.
 
 =head1 BASICS
 
-=head2 Inheriting from Test::Class::MOP
-
-Just C<use Test::Class::MOP>. That's all. You'll get all L<Test::Most> test
-functions, too, along with C<strict> and C<warnings>. You can use all L<MOP>
-behavior, too.
 
 =head2 Declare a test method
 
 All method names that begin with C<test_> are test methods. Methods that do
 not are not test methods.
 
- sub test_this_is_a_method {
-     my $test = shift;
+ class TestsFor::Some::Class extends Test::Class::MOP {
+     use Test::Most;
 
-     $test->this_is_not_a_test_method;
-     ok 1, 'whee!';
- }
+     method test_this_is_a_method($report) {
+         $self->this_is_not_a_test_method;
+         ok 1, 'whee!';
+     }
 
- sub this_is_not_a_test_method {
-    my $test = shift;
-    # but you can, of course, call it like normal
+     method this_is_not_a_test_method {
+        # but you can, of course, call it like normal
+     }
  }
 
 =head2 Plans
@@ -356,20 +351,18 @@ Each test method relies on an implicit C<done_testing> call.
 
 If you prefer, you can declare a plan in a test method:
 
-    sub test_something {
-        my ( $test, $report ) = @_;
+    method test_something($report) {
         $report->plan($num_tests);
         ...
     }
 
 You may call C<plan()> multiple times for a given test method. Each call to
-C<plan()> will add that number of tests to the plan.  For example, with a
-method modifier:
+C<plan()> will add that number of tests to the plan.  For example, with an
+overridden method:
 
-    before 'test_something' => sub {
-        my ( $test, $report ) = @_;
+    method test_something($report) {
+        $self->next::method($report);
         $report->plan($num_extra_tests);
-
         # more tests
     };
 
@@ -379,35 +372,35 @@ run does not match the plan.
 
 =head2 Inheriting from another Test::Class::MOP class
 
-List it as the C<extends> in the import list.
+List it as C<extends>, as you would expect.
 
- package TestsFor::Some::Class::Subclass;
- use Test::Class::MOP extends => 'TestsFor::Some::Class';
+ use mop;
 
- sub test_me {
-     my $test  = shift;
-     my $class = $test->test_class;
-     ok 1, "I overrode my parent! ($class)";
- }
+ # assumes TestsFor::Some::Class inherits from Test::Class::MOP
+ class TestsFor::Some::Class::Subclass extends TestsFor::Some::Class {
+     use Test::Most;
 
- before 'test_this_baby' => sub {
-     my $test  = shift;
-     my $class = $test->test_class;
-     pass "This should run before my parent method ($class)";
- };
+     method test_me($report) {
+         my $class = $self->test_class;
+         ok 1, "I overrode my parent! ($class)";
+     }
 
- sub this_should_not_run {
-     my $test = shift;
-     fail "We should never see this test";
- }
+     method test_this_baby($report) {
+         my $class = $self->test_class;
+         pass "This should run before my parent method ($class)";
+         $self->next::method($report);
+     }
 
- sub test_this_should_be_run {
-     for ( 1 .. 5 ) {
-         pass "This is test number $_ in this method";
+     method this_should_not_run {
+         fail "We should never see this test";
+     }
+
+     method test_this_should_be_run($report) {
+         for ( 1 .. 5 ) {
+             pass "This is test number $_ in this method";
+         }
      }
  }
-
- 1;
 
 =head1 TEST CONTROL METHODS
 
@@ -416,7 +409,7 @@ method to fail (this is a feature, not a bug).  If a test control method
 fails, the class/method will fail and testing for that class should stop.
 
 B<Every> test control method will be passed two arguments. The first is the
-C<$test> invocant. The second is an object implementing
+C<$self> invocant. The second is an object implementing
 L<Test::Class::MOP::Role::Reporting>. You may find that the C<notes> hashref
 is a handy way of recording information you later wish to use if you call C<<
 $test_suite->test_report >>.
@@ -427,23 +420,21 @@ These are:
 
 =item * C<test_startup>
 
- sub test_startup {
-    my ( $test, $report ) = @_;
-    $test->next::method;
+ method test_startup($report) {
+    $self->next::method($report);
     # more startup
  }
 
 Runs at the start of each test class. If you need to know the name of the
 class you're running this in (though usually you shouldn't), use
-C<< $test->test_class >>, or the C<name> method on the C<$report> object.
+C<< $self->test_class >>, or the C<name> method on the C<$report> object.
 
 The C<$report> object is a L<Test::Class::MOP::Report::Class> object.
 
 =item * C<test_setup>
 
- sub test_setup {
-    my ( $test, $report ) = @_;
-    $test->next::method;
+ method test_setup($report) {
+    $self->next::method($report);
     # more setup
  }
 
@@ -454,10 +445,9 @@ The C<$report> object is a L<Test::Class::MOP::Report::Method> object.
 
 =item * C<test_teardown>
 
- sub test_teardown {
-    my ( $test, $report ) = @_;
+ method test_teardown($report) {
     # more teardown
-    $test->next::method;
+    $self->next::method($report);
  }
 
 Runs at the end of each test method. 
@@ -466,10 +456,9 @@ The C<$report> object is a L<Test::Class::MOP::Report::Method> object.
 
 =item * C<test_shutdown>
 
- sub test_shutdown {
-     my ( $test, $report ) = @_;
+ method test_shutdown($report) {
      # more teardown
-     $test->next::method;
+     $self->next::method($report);
  }
 
 Runs at the end of each test class. 
@@ -480,17 +469,16 @@ The C<$report> object is a L<Test::Class::MOP::Report::Class> object.
 
 To override a test control method, just remember that this is OO:
 
- sub test_setup {
-     my  ( $test, $report ) = @_;
-     $test->next::method; # optional to call parent test_setup
+ method test_setup($report) {
+     $self->next::method($report); # optional to call parent test_setup
      # more setup code here
  }
 
 =head1 RUNNING THE TEST SUITE
 
-We I<strongly> recommend using L<Test::Class::MOP::Load> as the driver for
-your test suite. Simply point it at the directory or directories containing
-your test classes:
+We recommend using L<Test::Class::MOP::Load> as the driver for your test
+suite. Simply point it at the directory or directories containing your test
+classes:
 
  use Test::Class::MOP::Load 't/lib';
  Test::Class::MOP->new->runtests;
@@ -596,18 +584,15 @@ included. B<However>, they must still start with C<test_>. See C<include>.
 
 If you wish to skip a class, set the reason in the C<test_startup> method.
 
-    sub test_startup {
-        my ( $test, $report ) = @_;
-        $test->test_skip("I don't want to run this class");
+    method test_startup($report) {
+        $self->test_skip("I don't want to run this class");
     }
 
 If you wish to skip an individual method, do so in the C<test_setup> method.
 
-    sub test_setup {
-        my ( $test, $report ) = @_;
-
+    method test_setup($report) {
         if ( 'test_time_travel' eq $report->name ) {
-            $test->test_skip("Time travel not yet available");
+            $self->test_skip("Time travel not yet available");
         }
     }
 
@@ -621,13 +606,13 @@ cannot override.
 
 =head2 C<test_configuration>
 
- my $test_configuration = $test->test_configuration;
+ my $test_configuration = $self->test_configuration;
 
 Returns the L<Test::Class::MOP::Config> object.
 
 =head2 C<test_report>
 
- my $report = $test->test_report;
+ my $report = $self->test_report;
 
 Returns the L<Test::Class::MOP::Report> object. Useful if you want to do
 your own reporting and not rely on the default output provided with the
@@ -635,7 +620,7 @@ C<statistics> boolean option.
 
 =head2 C<test_class>
 
- my $class = $test->test_class;
+ my $class = $self->test_class;
 
 Returns the name for this test class. Useful if you rebless an object (such as
 applying a role at runtime) and don't want to lose the original class name.
