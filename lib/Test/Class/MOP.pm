@@ -647,11 +647,6 @@ the C<runtests> method. We don't recommend it.
 
 Returns the L<Test::Class::MOP> instance.
 
-=head2 C<import>
-
-Sadly, we have an C<import> method. This is used to automatically provide you
-with all of the L<Test::Most> behavior.
-
 =head1 SAMPLE TAP OUTPUT
 
 We use nested tests (subtests) at each level:
