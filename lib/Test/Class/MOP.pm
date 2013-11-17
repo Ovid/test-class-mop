@@ -260,6 +260,9 @@ END
             push @meta_classes => $meta;
         }
 
+        # XXX this was supposed to work, but didn't. I'll look at it later.
+        #my @methods = map { mop::meta($_)->methods } @{ mro::get_linear_isa($self) };
+
         foreach my $meta (@meta_classes) {
             foreach my $method ( $meta->methods ) {
 
