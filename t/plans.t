@@ -34,7 +34,6 @@ my $test_suite = Test::Class::MOP->new;
 subtest 'run the test suite' => sub {
     my $builder = Test::Builder->new;
     $builder->todo_start('deliberately bad plans');
-    $DB::single = 1;
     $test_suite->runtests;
     $builder->todo_end;
 };

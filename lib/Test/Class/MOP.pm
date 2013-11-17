@@ -251,15 +251,26 @@ END
 
     method test_methods {
         my @method_list;
-        foreach my $method ( mop::meta($self)->methods ) {
 
-            # attributes cannot be test methods
-            my $name = $method->name;
-            next unless $name =~ /^test_/;
+        # XXX walk the inheritance tree to gather up all methods. I'm sure
+        # there's a better way to do this, but I don't know it.
+        my @meta_classes = mop::meta($self);
+        while ( my $meta = mop::meta($meta_classes[-1]->superclass) ) {
+            last if $meta->name eq 'Test::Class::MOP';
+            push @meta_classes => $meta;
+        }
 
-            # don't use anything defined in this package
-            next if Test::Class::MOP->can($name);
-            push @method_list => $name;
+        foreach my $meta (@meta_classes) {
+            foreach my $method ( $meta->methods ) {
+
+                # attributes cannot be test methods
+                my $name = $method->name;
+                next unless $name =~ /^test_/;
+
+                # don't use anything defined in this package
+                next if Test::Class::MOP->can($name);
+                push @method_list => $name;
+            }
         }
 
         if ( my $include = $self->test_configuration->include ) {
