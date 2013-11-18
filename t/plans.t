@@ -40,8 +40,8 @@ subtest 'run the test suite' => sub {
 
 my $report = $test_suite->test_report;
 my %expected_tests_planned = (
-    'TestsFor::Person::test_person'           => 2,
-    'TestsFor::Person::Employee::test_person' => 3,
+    'TestsFor::Person::test_person'           => 1,
+    'TestsFor::Person::Employee::test_person' => 2,
 );
 my %expected_tests_run = (
     'TestsFor::Person::test_person'           => 1,
