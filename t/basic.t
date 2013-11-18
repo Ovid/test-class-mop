@@ -28,12 +28,15 @@ subtest 'test suite' => sub {
     $test_suite->runtests;
 };
 
-mop::meta('TestsFor::Basic::Subclass')->add_method(
-    mop::method->new(
+my $subclass_meta = mop::meta('TestsFor::Basic::Subclass');
+$subclass_meta->add_method(
+    $subclass_meta->method_class->new(
         name => 'test_this_will_die',
         body => sub { die 'forced die' },
     )
 );
+$subclass_meta->FINALIZE;
+
 my $builder = $test_suite->test_configuration->builder;
 $builder->todo_start('testing a dying test');
 my @tests;
