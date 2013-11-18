@@ -38,7 +38,7 @@ sub _load {
 
     # either "require" it or "use" it with no import list. Otherwise, this
     # module will inherit from Test::Class::MOP and break everything.
-    eval "use $package ()"; ## no critic
+    eval "package main; use $package ()"; ## no critic
     die $@ if $@;
 }
 

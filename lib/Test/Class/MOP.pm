@@ -15,12 +15,13 @@ use List::MoreUtils qw(uniq);
 use Test::Builder;
 use Test::Most;
 use Try::Tiny;
+use Test::Class::MOP::Meta;
 use Test::Class::MOP::Config;
 use Test::Class::MOP::Report;
 use Test::Class::MOP::Report::Class;
 use Test::Class::MOP::Report::Method;
 
-class Test::Class::MOP {
+class Test::Class::MOP meta TestClassMeta {
     has $!test_configuration is ro;
     has $!test_class         is rw;
     has $!test_report        is ro = Test::Class::MOP::Report->new;
@@ -276,7 +277,8 @@ END
                 # releases, hopefully, will rely on method traits to define
                 # test methods.
                 next if $meta->has_attribute('$!'.$name);
-                next unless $name =~ /^test_/;
+#                next unless $name =~ /^test_/;
+                next unless $method->is_testcase;
 
                 # don't use anything defined in this package
                 next if __CLASS__->can($name);
