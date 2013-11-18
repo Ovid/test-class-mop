@@ -99,9 +99,10 @@ eq_or_diff { result => \@tests }, { result => \@expected },
         'type'      => ''
     },
 );
-mop::meta('TestsFor::Basic::Subclass')->remove_method('test_startup');
-mop::meta('TestsFor::Basic::Subclass')->add_method(
-    mop::method->new(
+my $subclass_meta = mop::meta('TestsFor::Basic::Subclass');
+$subclass_meta->remove_method('test_startup');
+$subclass_meta->add_method(
+    $subclass_meta->method_class->new(
         name => 'test_setup',
         body => sub {
             my ( $test, $method ) = @_;
@@ -111,6 +112,7 @@ mop::meta('TestsFor::Basic::Subclass')->add_method(
         },
     )
 );
+$subclass_meta->FINALIZE;
 $builder->todo_start('fail?');
 $tests = Test::Class::MOP->new;
 subtest 'test_setup() has tests in it' => sub {
