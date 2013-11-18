@@ -4,6 +4,8 @@ class TestsFor::Person extends Test::Class::MOP
     use Test::Most;
     has $!test_fixture is rw;
 
+    # XXX bare return required due to this bug:
+    # https://github.com/stevan/p5-mop-redux/issues/148
     method extra_constructor_args { return }
 
     method test_setup($report) {
