@@ -4,8 +4,8 @@
 use mop;
 
 class Test::Class::MOP::Config {
-    has $!show_timing     is ro = $_->use_environment && $ENV{HARNESS_IS_VERBOSE};
-    has $!statistics      is ro = $_->use_environment && $ENV{HARNESS_IS_VERBOSE};
+    has $!show_timing     is ro = ( $_->use_environment && $ENV{HARNESS_IS_VERBOSE} );
+    has $!statistics      is ro = ( $_->use_environment && $ENV{HARNESS_IS_VERBOSE} );
     has $!builder         is ro = Test::Builder->new;
     has $!use_environment is ro;
     has $!test_class      is ro;

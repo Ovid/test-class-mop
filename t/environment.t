@@ -4,6 +4,8 @@ use Test::Most;
 use Scalar::Util 'looks_like_number';
 use Test::Class::MOP::Load qw(t/lib);
 
+plan skip_all => 'https://github.com/stevan/p5-mop-redux/issues/151';
+
 
 {
     my $test_suite = Test::Class::MOP->new;
@@ -47,8 +49,8 @@ use Test::Class::MOP::Load qw(t/lib);
     my $test_suite = Test::Class::MOP->new(
         use_environment => 1,
     );
-    is ( $test_suite->test_configuration->show_timing, undef, 'show timing set to undef when harness is not verbose' );
-    is ( $test_suite->test_configuration->statistics, undef, 'statistics set to undef when harness is not verbose' );
+    ok !$test_suite->test_configuration->show_timing, 'show timing set to false when harness is not verbose';
+    ok !$test_suite->test_configuration->statistics, 'statistics set to false when harness is not verbose';
 }
 
 
