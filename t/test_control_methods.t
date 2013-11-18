@@ -16,12 +16,14 @@ my $builder = $tests->test_configuration->builder;
 #
 # exceptions in test control methods should cause the test classes to fail
 #
-mop::meta('TestsFor::Basic::Subclass')->add_method(
-    mop::method->new(
+my $subclass_meta = mop::meta('TestsFor::Basic::Subclass');
+$subclass_meta->add_method(
+    $subclass_meta->method_class->new(
         name => 'test_startup',
         body => sub { die 'forced die' },
     )
 );
+$subclass_meta->FINALIZE;
 $builder->todo_start('testing the startup() method');
 my @tests;
 subtest 'test_startup() dies' => sub {
@@ -44,10 +46,11 @@ my @expected = (
         'type'      => ''
     },
 );
-eq_or_diff { result => $tests[0] }, { result => $expected[0] },
-  'Our first test class should fail with a failing startup()';
+
 eq_or_diff { result => $tests[1] }, { result => $expected[1] },
-  '... but its parent class should succeed because it does not have a failing startup';
+  'Our subclass should fail if tests are run in the test control methods';
+eq_or_diff { result => $tests[0] }, { result => $expected[0] },
+  '... but its parent class should succeed because it does not have tests in the startup';
 
 #
 # test control methods that live and have no tests should not cause issues
@@ -66,13 +69,14 @@ eq_or_diff { result => $tests[1] }, { result => $expected[1] },
         'type'      => ''
     },
 );
-mop::meta('TestsFor::Basic::Subclass')->remove_method('test_startup');
-mop::meta('TestsFor::Basic::Subclass')->add_method(
-    mop::method->new(
+$subclass_meta->remove_method('test_startup');
+$subclass_meta->add_method(
+    $subclass_meta->method_class->new(
         name => 'test_startup',
         body => sub { my $test = shift },
     )
 );
+$subclass_meta->FINALIZE;
 $tests = Test::Class::MOP->new;
 subtest 'test_startup() has tests in it' => sub {
     $tests->runtests;
@@ -99,7 +103,6 @@ eq_or_diff { result => \@tests }, { result => \@expected },
         'type'      => ''
     },
 );
-my $subclass_meta = mop::meta('TestsFor::Basic::Subclass');
 $subclass_meta->remove_method('test_startup');
 $subclass_meta->add_method(
     $subclass_meta->method_class->new(
