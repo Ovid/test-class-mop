@@ -1,6 +1,9 @@
 # PODNAME: Test::Class::MOP
 # ABSTRACT: Test::Class + MOP
 
+# package declaration required due to this bug:
+# https://github.com/stevan/p5-mop-redux/issues/147
+package main;
 use 5.016;
 use strict;
 use warnings;
@@ -240,7 +243,7 @@ END
         unless ($classes) {
             $classes = [
                 sort
-                grep { $_ ne 'Test::Class::MOP' && $_->isa('Test::Class::MOP') }
+                grep { $_ ne __CLASS__ && $_->isa(__CLASS__) }
                 map { s!/!::!g; s/\.pm$//; $_ } keys %INC
             ];
         }
@@ -256,7 +259,7 @@ END
         # there's a better way to do this, but I don't know it.
         my @meta_classes = mop::meta($self);
         while ( my $meta = mop::meta($meta_classes[-1]->superclass) ) {
-            last if $meta->name eq 'Test::Class::MOP';
+            last if $meta->name eq __CLASS__;
             push @meta_classes => $meta;
         }
 
@@ -271,7 +274,7 @@ END
                 next unless $name =~ /^test_/;
 
                 # don't use anything defined in this package
-                next if Test::Class::MOP->can($name);
+                next if __CLASS__->can($name);
                 push @method_list => $name;
             }
         }
