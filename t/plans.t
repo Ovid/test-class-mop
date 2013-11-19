@@ -40,12 +40,12 @@ subtest 'run the test suite' => sub {
 
 my $report = $test_suite->test_report;
 my %expected_tests_planned = (
-    'TestsFor::Person::test_person'           => 1,
-    'TestsFor::Person::Employee::test_person' => 2,
+    'TestsFor::Person::simple_test'           => 1,
+    'TestsFor::Person::Employee::simple_test' => 2,
 );
 my %expected_tests_run = (
-    'TestsFor::Person::test_person'           => 1,
-    'TestsFor::Person::Employee::test_person' => 2,
+    'TestsFor::Person::simple_test'           => 1,
+    'TestsFor::Person::Employee::simple_test' => 2,
 );
 foreach my $class ( $report->all_test_classes ) {
     foreach my $method ( $class->all_test_methods ) {

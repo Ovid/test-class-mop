@@ -670,7 +670,7 @@ We use nested tests (subtests) at each level:
     # Executing tests for TestsFor::Basic::Subclass
     # 
         1..3
-        # TestsFor::Basic::Subclass->test_me()
+        # TestsFor::Basic::Subclass->overrides_something()
             ok 1 - I overrode my parent! (TestsFor::Basic::Subclass)
             1..1
         ok 1 - test_me
@@ -679,20 +679,20 @@ We use nested tests (subtests) at each level:
             ok 2 - whee! (TestsFor::Basic::Subclass)
             1..2
         ok 2 - test_this_baby
-        # TestsFor::Basic::Subclass->test_this_should_be_run()
+        # TestsFor::Basic::Subclass->this_should_be_run()
             ok 1 - This is test number 1 in this method
             ok 2 - This is test number 2 in this method
             ok 3 - This is test number 3 in this method
             ok 4 - This is test number 4 in this method
             ok 5 - This is test number 5 in this method
             1..5
-        ok 3 - test_this_should_be_run
+        ok 3 - this_should_be_run
     ok 1 - TestsFor::Basic::Subclass
     # 
     # Executing tests for TestsFor::Basic
     # 
         1..2
-        # TestsFor::Basic->test_me()
+        # TestsFor::Basic->overrides_something()
             ok 1 - test_me() ran (TestsFor::Basic)
             ok 2 - this is another test (TestsFor::Basic)
             1..2

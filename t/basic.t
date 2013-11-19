@@ -11,7 +11,7 @@ my %methods_for = (
         qw/
           test_me
           test_this_baby
-          test_this_should_be_run
+          this_should_be_run
           /
     ],
 );
