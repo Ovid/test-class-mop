@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use Test::Most;
+use Test::Most 'bail';
 use lib 'lib';
 use Test::Class::MOP::Load qw(t/lib);
 
@@ -61,7 +61,7 @@ my @expected_tests = (
         'type'      => ''
     }
 );
-eq_or_diff \@tests, \@expected_tests,
+eq_or_diff { tests => \@tests }, { tests => \@expected_tests },
   'Dying test methods should fail but not kill the test suite';
 
 done_testing;
