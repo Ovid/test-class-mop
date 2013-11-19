@@ -1,4 +1,8 @@
 Revision history for Perl distribution Test-Class-MOP
 
+0.02 2013-11-17
+        - Added 'is testcase' trait. Test methods no longer need to start with
+          test_ (thanks to Toby Inkster for the suggestion)
+
 0.01 2013-11-17
         - Test::Class + p5-mop-redux
