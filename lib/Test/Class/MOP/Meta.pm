@@ -14,9 +14,10 @@ use Carp;
 
         my $name = $method->name;
         if ( grep {/^test_(?:startup|setup|teardown|shutdown)$/} $name ) {
+            my $class = $method->associated_meta->name;
 
             # XXX how do I get the class name here?
-            croak("Test control methods may not use a testcase trait: $name");
+            croak("Test control methods may not use a testcase trait: $class->$name");
         }
     }
 
