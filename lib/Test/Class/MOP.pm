@@ -310,7 +310,7 @@ __END__
         use Test::Most;
 
         # methods that begin with test_ are test methods.
-        method test_constructor($report) {
+        method constructor($report) is testcase {
             $report->plan(3);    # strictly optional
 
             can_ok 'DateTime', 'new';
@@ -338,13 +338,13 @@ L<https://github.com/stevan/p5-mop-redux>. Better docs will come later.
 
 =head2 Declare a test method
 
-All method names that begin with C<test_> are test methods. Methods that do
+All method that have the C<is testcase> trait are test methods. Methods that do
 not are not test methods.
 
  class TestsFor::Some::Class extends Test::Class::MOP {
      use Test::Most;
 
-     method test_this_is_a_method($report) {
+     method this_is_a_method($report) is testcase {
          $self->this_is_not_a_test_method;
          ok 1, 'whee!';
      }
@@ -364,7 +364,7 @@ Each test method relies on an implicit C<done_testing> call.
 
 If you prefer, you can declare a plan in a test method:
 
-    method test_something($report) {
+    method something($report) is testcase {
         $report->plan($num_tests);
         ...
     }
@@ -373,7 +373,7 @@ You may call C<plan()> multiple times for a given test method. Each call to
 C<plan()> will add that number of tests to the plan.  For example, with an
 overridden method:
 
-    method test_something($report) {
+    method something($report) is testcase {
         $self->next::method($report);
         $report->plan($num_extra_tests);
         # more tests
@@ -393,12 +393,12 @@ List it as C<extends>, as you would expect.
  class TestsFor::Some::Class::Subclass extends TestsFor::Some::Class {
      use Test::Most;
 
-     method test_me($report) {
+     method overrides_something ($report) is testcase {
          my $class = $self->test_class;
          ok 1, "I overrode my parent! ($class)";
      }
 
-     method test_this_baby($report) {
+     method test_this_baby($report) is testcase {
          my $class = $self->test_class;
          pass "This should run before my parent method ($class)";
          $self->next::method($report);
@@ -408,7 +408,7 @@ List it as C<extends>, as you would expect.
          fail "We should never see this test";
      }
 
-     method test_this_should_be_run($report) {
+     method this_should_be_run($report) is testcase {
          for ( 1 .. 5 ) {
              pass "This is test number $_ in this method";
          }
@@ -420,12 +420,14 @@ List it as C<extends>, as you would expect.
 Do not run tests in test control methods. This will cause the test control
 method to fail (this is a feature, not a bug).  If a test control method
 fails, the class/method will fail and testing for that class should stop.
+Further, applying the C<is testcase> trait to a test control method is also
+fatal.
 
 B<Every> test control method will be passed two arguments. The first is the
 C<$self> invocant. The second is an object implementing
 L<Test::Class::MOP::Role::Reporting>. You may find that the C<notes> hashref
-is a handy way of recording information you later wish to use if you call C<<
-$test_suite->test_report >>.
+is a handy way of recording information you later wish to use if you call
+C<< $test_suite->test_report >>.
 
 These are:
 
