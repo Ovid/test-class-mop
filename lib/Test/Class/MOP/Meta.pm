@@ -10,7 +10,14 @@ use Carp;
     sub testcase {
         my $method = shift;
         Carp::croak("testcase trait is only valid on methods")
-            unless $method->isa('mop::method');
+          unless $method->isa('mop::method');
+
+        my $name = $method->name;
+        if ( grep {/^test_(?:startup|setup|teardown|shutdown)$/} $name ) {
+
+            # XXX how do I get the class name here?
+            croak("Test control methods may not use a testcase trait: $name");
+        }
     }
 
     class TestMethodMeta extends mop::method {
