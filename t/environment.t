@@ -4,9 +4,6 @@ use Test::Most;
 use Scalar::Util 'looks_like_number';
 use Test::Class::MOP::Load qw(t/lib);
 
-plan skip_all => 'https://github.com/stevan/p5-mop-redux/issues/151';
-
-
 {
     my $test_suite = Test::Class::MOP->new;
     is ( $test_suite->test_configuration->show_timing, undef, 'show timing is undef by default' );
