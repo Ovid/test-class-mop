@@ -6,7 +6,7 @@ class TestsFor::Person::Employee extends TestsFor::Person {
         return ( employee_number => 666 );
     }
 
-    method test_person($report) {
+    method simple_test($report) is testcase {
         $self->next::method($report);
         $report->plan(1);
         is $self->test_fixture->employee_number, 666,

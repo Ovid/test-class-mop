@@ -54,7 +54,7 @@ $test_suite = Test::Class::MOP->new(
     'TestsFor::Basic::Subclass' => [
         qw/
           test_me
-          test_this_should_be_run
+          this_should_be_run
           /
     ],
 );

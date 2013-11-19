@@ -17,7 +17,7 @@ class TestsFor::Person extends Test::Class::MOP
         ));
     }
 
-    method test_person($report) {
+    method simple_test($report) is testcase {
         $report->plan(1);
         is $self->test_fixture->full_name, 'Bob Dobbs',
             'Our full name should be correct';

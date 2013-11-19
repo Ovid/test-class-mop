@@ -129,4 +129,16 @@ eq_or_diff { result => $tests[0] }, { result => $expected[0] },
 eq_or_diff { result => $tests[1] }, { result => $expected[1] },
   '... but its parent class should succeed because it does not have tests in the startup';
 
+eval <<'END';
+use mop;
+class Anything extends Test::Class::MOP {
+    method test_startup($report) is testcase {}
+}
+END
+
+my $error = $@;
+like $error,
+  qr/^Test control methods may not use a testcase trait: test_startup/,
+  'Applying the testcase trait to a test control method should be fatal';
+
 done_testing;

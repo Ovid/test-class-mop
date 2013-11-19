@@ -15,12 +15,13 @@ use List::MoreUtils qw(uniq);
 use Test::Builder;
 use Test::Most;
 use Try::Tiny;
+use Test::Class::MOP::Meta;
 use Test::Class::MOP::Config;
 use Test::Class::MOP::Report;
 use Test::Class::MOP::Report::Class;
 use Test::Class::MOP::Report::Method;
 
-class Test::Class::MOP {
+class Test::Class::MOP meta TestClassMeta {
     has $!test_configuration is ro;
     has $!test_class         is rw;
     has $!test_report        is ro = Test::Class::MOP::Report->new;
@@ -268,17 +269,10 @@ END
 
         foreach my $meta (@meta_classes) {
             foreach my $method ( $meta->methods ) {
-
-                # attributes cannot be test methods
-                my $name = $method->name;
-
-                # XXX currently there's no decent way of fixing this. Future
-                # releases, hopefully, will rely on method traits to define
-                # test methods.
-                next if $meta->has_attribute('$!'.$name);
-                next unless $name =~ /^test_/;
+                next unless $method->isa('TestMethodMeta') && $method->is_testcase;
 
                 # don't use anything defined in this package
+                my $name = $method->name;
                 next if __CLASS__->can($name);
                 push @method_list => $name;
             }
@@ -315,8 +309,7 @@ __END__
         use DateTime;
         use Test::Most;
 
-        # methods that begin with test_ are test methods.
-        method test_constructor($report) {
+        method constructor($report) is testcase {
             $report->plan(3);    # strictly optional
 
             can_ok 'DateTime', 'new';
@@ -344,13 +337,13 @@ L<https://github.com/stevan/p5-mop-redux>. Better docs will come later.
 
 =head2 Declare a test method
 
-All method names that begin with C<test_> are test methods. Methods that do
+All method that have the C<is testcase> trait are test methods. Methods that do
 not are not test methods.
 
  class TestsFor::Some::Class extends Test::Class::MOP {
      use Test::Most;
 
-     method test_this_is_a_method($report) {
+     method this_is_a_method($report) is testcase {
          $self->this_is_not_a_test_method;
          ok 1, 'whee!';
      }
@@ -370,7 +363,7 @@ Each test method relies on an implicit C<done_testing> call.
 
 If you prefer, you can declare a plan in a test method:
 
-    method test_something($report) {
+    method something($report) is testcase {
         $report->plan($num_tests);
         ...
     }
@@ -379,7 +372,7 @@ You may call C<plan()> multiple times for a given test method. Each call to
 C<plan()> will add that number of tests to the plan.  For example, with an
 overridden method:
 
-    method test_something($report) {
+    method something($report) is testcase {
         $self->next::method($report);
         $report->plan($num_extra_tests);
         # more tests
@@ -399,12 +392,12 @@ List it as C<extends>, as you would expect.
  class TestsFor::Some::Class::Subclass extends TestsFor::Some::Class {
      use Test::Most;
 
-     method test_me($report) {
+     method overrides_something ($report) is testcase {
          my $class = $self->test_class;
          ok 1, "I overrode my parent! ($class)";
      }
 
-     method test_this_baby($report) {
+     method test_this_baby($report) is testcase {
          my $class = $self->test_class;
          pass "This should run before my parent method ($class)";
          $self->next::method($report);
@@ -414,7 +407,7 @@ List it as C<extends>, as you would expect.
          fail "We should never see this test";
      }
 
-     method test_this_should_be_run($report) {
+     method this_should_be_run($report) is testcase {
          for ( 1 .. 5 ) {
              pass "This is test number $_ in this method";
          }
@@ -426,12 +419,14 @@ List it as C<extends>, as you would expect.
 Do not run tests in test control methods. This will cause the test control
 method to fail (this is a feature, not a bug).  If a test control method
 fails, the class/method will fail and testing for that class should stop.
+Further, applying the C<is testcase> trait to a test control method is also
+fatal.
 
 B<Every> test control method will be passed two arguments. The first is the
 C<$self> invocant. The second is an object implementing
 L<Test::Class::MOP::Role::Reporting>. You may find that the C<notes> hashref
-is a handy way of recording information you later wish to use if you call C<<
-$test_suite->test_report >>.
+is a handy way of recording information you later wish to use if you call
+C<< $test_suite->test_report >>.
 
 These are:
 
@@ -675,7 +670,7 @@ We use nested tests (subtests) at each level:
     # Executing tests for TestsFor::Basic::Subclass
     # 
         1..3
-        # TestsFor::Basic::Subclass->test_me()
+        # TestsFor::Basic::Subclass->overrides_something()
             ok 1 - I overrode my parent! (TestsFor::Basic::Subclass)
             1..1
         ok 1 - test_me
@@ -684,20 +679,20 @@ We use nested tests (subtests) at each level:
             ok 2 - whee! (TestsFor::Basic::Subclass)
             1..2
         ok 2 - test_this_baby
-        # TestsFor::Basic::Subclass->test_this_should_be_run()
+        # TestsFor::Basic::Subclass->this_should_be_run()
             ok 1 - This is test number 1 in this method
             ok 2 - This is test number 2 in this method
             ok 3 - This is test number 3 in this method
             ok 4 - This is test number 4 in this method
             ok 5 - This is test number 5 in this method
             1..5
-        ok 3 - test_this_should_be_run
+        ok 3 - this_should_be_run
     ok 1 - TestsFor::Basic::Subclass
     # 
     # Executing tests for TestsFor::Basic
     # 
         1..2
-        # TestsFor::Basic->test_me()
+        # TestsFor::Basic->overrides_something()
             ok 1 - test_me() ran (TestsFor::Basic)
             ok 2 - this is another test (TestsFor::Basic)
             1..2
