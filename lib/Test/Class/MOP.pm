@@ -309,7 +309,6 @@ __END__
         use DateTime;
         use Test::Most;
 
-        # methods that begin with test_ are test methods.
         method constructor($report) is testcase {
             $report->plan(3);    # strictly optional
 
