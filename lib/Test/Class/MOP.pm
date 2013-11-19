@@ -269,18 +269,10 @@ END
 
         foreach my $meta (@meta_classes) {
             foreach my $method ( $meta->methods ) {
-
-                # attributes cannot be test methods
-                my $name = $method->name;
-
-                # XXX currently there's no decent way of fixing this. Future
-                # releases, hopefully, will rely on method traits to define
-                # test methods.
-                next if $meta->has_attribute('$!'.$name);
-#                next unless $name =~ /^test_/;
-                next unless $method->is_testcase;
+                next unless $method->isa('TestMethodMeta') && $method->is_testcase;
 
                 # don't use anything defined in this package
+                my $name = $method->name;
                 next if __CLASS__->can($name);
                 push @method_list => $name;
             }
