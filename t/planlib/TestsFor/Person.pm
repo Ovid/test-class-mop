@@ -1,6 +1,8 @@
 use mop;
-class TestsFor::Person extends Test::Class::MOP
- with Test::Class::MOP::Role::AutoUse {
+
+  class TestsFor::Person
+extends Test::Class::MOP
+   with Test::Class::MOP::Role::AutoUse {
     use Test::Most;
     has $!test_fixture is rw;
 
